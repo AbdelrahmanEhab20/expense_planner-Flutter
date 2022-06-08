@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_complete_guide/widgets/transaction_item.dart';
+// import 'package:intl/intl.dart';
 
 import '../models/transaction.dart';
 
@@ -35,54 +36,9 @@ class TransactionList extends StatelessWidget {
             })
           : ListView.builder(
               itemBuilder: (ctx, index) {
-                return Card(
-                  elevation: 5,
-                  margin: EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Padding(
-                        padding: EdgeInsets.all(6),
-                        child: FittedBox(
-                          child: Text(
-                            '\$${transactions[index].amount.toStringAsFixed(2)}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),
-                    title: Text(
-                      transactions[index].title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    subtitle: Text(
-                      DateFormat.yMMMd().format(transactions[index].date),
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    trailing: MediaQuery.of(context).size.width > 460
-                        ? TextButton.icon(
-                            icon: Icon(
-                              Icons.delete_forever_sharp,
-                              color: Colors.black,
-                            ),
-                            label: Text(
-                              'Delete',
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            onPressed: (() => deleteTx(transactions[index].id)),
-                          )
-                        : IconButton(
-                            icon: Icon(
-                              Icons.delete_forever_sharp,
-                              color: Colors.black,
-                            ),
-                            onPressed: (() => deleteTx(transactions[index].id)),
-                          ),
-                  ),
+                return TransactionItem(
+                  transaction: transactions[index],
+                  deleteTx: deleteTx,
                 );
                 // return Card(
                 //   child: Row(

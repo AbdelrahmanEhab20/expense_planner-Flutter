@@ -45,7 +45,7 @@ class MyHomePage extends StatefulWidget {
 
 bool _showChart = false;
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final List<Transaction> _userTransactions = [
     // old Testing Data
   ];
@@ -54,6 +54,23 @@ class _MyHomePageState extends State<MyHomePage> {
     return _userTransactions.where((element) {
       return element.date.isAfter(DateTime.now().subtract(Duration(days: 7)));
     }).toList();
+  }
+
+  @override
+  void didChangeAppLifeCycleState(AppLifecycleState state) {
+    print(state);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void _addNewTransaction(
@@ -89,6 +106,38 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  List<Widget> _buildFunctionWidgetLandScape(
+      MediaQueryData mediaCustomQuery, AppBar MyAppBar, Widget txList) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Show Chart'),
+          Switch(
+              value: _showChart,
+              onChanged: (val) {
+                setState(() {
+                  _showChart = val;
+                });
+              })
+        ],
+      )
+    ];
+  }
+
+  List<Widget> _buildFunctionWidgetPortrait(
+      MediaQueryData mediaCustomQuery, AppBar MyAppBar, Widget txList) {
+    return [
+      Container(
+          height: (mediaCustomQuery.size.height -
+                  MyAppBar.preferredSize.height -
+                  mediaCustomQuery.padding.top) *
+              0.3,
+          child: Chart(_recentTransactions)),
+      txList
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaCustomQuery = MediaQuery.of(context);
@@ -116,31 +165,14 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: MyAppBar,
       body: SingleChildScrollView(
         child: Column(
-          // mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             if (isLandScape)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Show Chart'),
-                  Switch(
-                      value: _showChart,
-                      onChanged: (val) {
-                        setState(() {
-                          _showChart = val;
-                        });
-                      })
-                ],
-              ),
+              ..._buildFunctionWidgetLandScape(
+                  mediaCustomQuery, MyAppBar, txList),
             if (!isLandScape)
-              Container(
-                  height: (mediaCustomQuery.size.height -
-                          MyAppBar.preferredSize.height -
-                          mediaCustomQuery.padding.top) *
-                      0.3,
-                  child: Chart(_recentTransactions)),
-            if (!isLandScape) txList,
+              ..._buildFunctionWidgetPortrait(
+                  mediaCustomQuery, MyAppBar, txList),
             if (isLandScape)
               _showChart
                   ? Container(
