@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_complete_guide/widgets/chart.dart';
 import './widgets/new_transaction.dart';
 import './widgets/transaction_list.dart';
 import './models/transaction.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations(
+  //     [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Personal Expenses',
       theme: ThemeData(
           textTheme: ThemeData.light().textTheme.copyWith(
@@ -17,8 +24,8 @@ class MyApp extends StatelessWidget {
                   fontFamily: 'OpenSans',
                   fontSize: 18,
                   fontWeight: FontWeight.bold)),
-          primarySwatch: Colors.purple,
-          accentColor: Colors.purpleAccent,
+          primarySwatch: Colors.teal,
+          accentColor: Colors.tealAccent,
           appBarTheme: const AppBarTheme(
               elevation: 15,
               titleTextStyle: TextStyle(
@@ -36,26 +43,11 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+bool _showChart = false;
+
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [
-    // Transaction(
-    //   id: 't1',
-    //   title: 'New Shoes',
-    //   amount: 69.99,
-    //   date: DateTime.now(),
-    // ),
-    // Transaction(
-    //   id: 't2',
-    //   title: 'Weekly Groceries',
-    //   amount: 80.53,
-    //   date: DateTime.now(),
-    // ),
-    // Transaction(
-    //   id: 't3',
-    //   title: 'Daily Food',
-    //   amount: 10.53,
-    //   date: DateTime.now(),
-    // ),
+    // old Testing Data
   ];
 
   List<Transaction> get _recentTransactions {
@@ -99,24 +91,65 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaCustomQuery = MediaQuery.of(context);
+    final isLandScape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final MyAppBar = AppBar(
+      leading: Icon(Icons.money),
+      title: Text('Personal Expenses'),
+      centerTitle: true,
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add_box_sharp),
+          onPressed: () => _startAddNewTransaction(context),
+        ),
+      ],
+    );
+    final txList = Container(
+        height: (mediaCustomQuery.size.height -
+                MyAppBar.preferredSize.height -
+                mediaCustomQuery.padding.top) *
+            0.7,
+        child: TransactionList(_userTransactions, _deleteTransaction));
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Personal Expenses'),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _startAddNewTransaction(context),
-          ),
-        ],
-      ),
+      appBar: MyAppBar,
       body: SingleChildScrollView(
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Chart(_recentTransactions),
-            TransactionList(_userTransactions, _deleteTransaction),
+            if (isLandScape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Show Chart'),
+                  Switch(
+                      value: _showChart,
+                      onChanged: (val) {
+                        setState(() {
+                          _showChart = val;
+                        });
+                      })
+                ],
+              ),
+            if (!isLandScape)
+              Container(
+                  height: (mediaCustomQuery.size.height -
+                          MyAppBar.preferredSize.height -
+                          mediaCustomQuery.padding.top) *
+                      0.3,
+                  child: Chart(_recentTransactions)),
+            if (!isLandScape) txList,
+            if (isLandScape)
+              _showChart
+                  ? Container(
+                      height: (mediaCustomQuery.size.height -
+                              MyAppBar.preferredSize.height -
+                              mediaCustomQuery.padding.top) *
+                          0.7,
+                      child: Chart(_recentTransactions))
+                  : txList,
           ],
         ),
       ),

@@ -14,23 +14,25 @@ class TransactionList extends StatelessWidget {
     return Container(
       height: 500,
       child: transactions.isEmpty
-          ? Column(
-              children: [
-                Text(
-                  'No transactions added yet !!',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                    height: 200,
-                    child: Image.asset(
-                      'assets/images/waiting.png',
-                      fit: BoxFit.cover,
-                    ))
-              ],
-            )
+          ? LayoutBuilder(builder: (ctx, constraint) {
+              return Column(
+                children: [
+                  Text(
+                    'No transactions added yet !!',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                      height: constraint.maxHeight * 0.6,
+                      child: Image.asset(
+                        'assets/images/waiting.png',
+                        fit: BoxFit.cover,
+                      ))
+                ],
+              );
+            })
           : ListView.builder(
               itemBuilder: (ctx, index) {
                 return Card(
@@ -43,7 +45,9 @@ class TransactionList extends StatelessWidget {
                         padding: EdgeInsets.all(6),
                         child: FittedBox(
                           child: Text(
-                              '\$${transactions[index].amount.toStringAsFixed(2)}'),
+                            '\$${transactions[index].amount.toStringAsFixed(2)}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ),
@@ -57,13 +61,27 @@ class TransactionList extends StatelessWidget {
                         color: Colors.grey,
                       ),
                     ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
-                      onPressed: (() => deleteTx(transactions[index].id)),
-                    ),
+                    trailing: MediaQuery.of(context).size.width > 460
+                        ? TextButton.icon(
+                            icon: Icon(
+                              Icons.delete_forever_sharp,
+                              color: Colors.black,
+                            ),
+                            label: Text(
+                              'Delete',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: (() => deleteTx(transactions[index].id)),
+                          )
+                        : IconButton(
+                            icon: Icon(
+                              Icons.delete_forever_sharp,
+                              color: Colors.black,
+                            ),
+                            onPressed: (() => deleteTx(transactions[index].id)),
+                          ),
                   ),
                 );
                 // return Card(
