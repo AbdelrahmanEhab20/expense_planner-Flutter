@@ -44,7 +44,8 @@ class _TransactionItemState extends State<TransactionItem> {
             child: FittedBox(
               child: Text(
                 '\$${widget.transaction.amount.toStringAsFixed(2)}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
           ),
