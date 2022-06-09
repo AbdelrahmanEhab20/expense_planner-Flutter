@@ -56,22 +56,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }).toList();
   }
 
-  @override
-  void didChangeAppLifeCycleState(AppLifecycleState state) {
-    print(state);
-  }
+  // @override
+  // void didChangeAppLifeCycleState(AppLifecycleState state) {
+  //   print(state);
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addObserver(this);
+  // }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   WidgetsBinding.instance.removeObserver(this);
+  //   super.dispose();
+  // }
 
   void _addNewTransaction(
       String txTitle, double txAmount, DateTime selectedDate) {
@@ -81,7 +81,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       date: selectedDate,
       id: DateTime.now().toString(),
     );
-
     setState(() {
       _userTransactions.add(newTx);
     });
@@ -121,7 +120,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 });
               })
         ],
-      )
+      ),
+      _showChart
+          ? Container(
+              height: (mediaCustomQuery.size.height -
+                      MyAppBar.preferredSize.height -
+                      mediaCustomQuery.padding.top) *
+                  0.65,
+              child: Chart(_recentTransactions))
+          : txList,
     ];
   }
 
@@ -173,15 +180,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             if (!isLandScape)
               ..._buildFunctionWidgetPortrait(
                   mediaCustomQuery, MyAppBar, txList),
-            if (isLandScape)
-              _showChart
-                  ? Container(
-                      height: (mediaCustomQuery.size.height -
-                              MyAppBar.preferredSize.height -
-                              mediaCustomQuery.padding.top) *
-                          0.7,
-                      child: Chart(_recentTransactions))
-                  : txList,
           ],
         ),
       ),
